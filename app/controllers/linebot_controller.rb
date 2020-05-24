@@ -8,7 +8,6 @@ class LinebotController < ApplicationController
     unless client.validate_signature(body, signature)
       return head :bad_request
     end
-    calender = Calender.find_by(date: Date.today)
     events = client.parse_events_from(body)
     events.each { |event|
       case event
@@ -18,8 +17,10 @@ class LinebotController < ApplicationController
           input = event.message['text']
           case input
           when /.*(明日|あした).*/
+            calender = Calender.find_by(date: Date.today.in(1.days))
             push = "明日は#{calender.garbage_type_str}だグワァー。"
           when /.*(明後日|あさって).*/
+            calender = Calender.find_by(date: Date.today.in(2.days))
             push = "明後日は#{calender.garbage_type_str}だグワァー。"
           when /.*(かわいい|可愛い|カワイイ|きれい|綺麗|キレイ|素敵|ステキ|すてき|面白い|おもしろい|ありがと|すごい|スゴイ|スゴい|好き|頑張|がんば|ガンバ).*/
             push = "ありがとうグワァー。おいら頑張っちゃうグワァー。"
